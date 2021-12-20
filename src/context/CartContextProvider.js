@@ -42,7 +42,7 @@ const cartReducer = (state , action) => {
 
                 case "DECREASE" :
                     const indexD = state.selectedItems.findIndex( item => item.id === action.payload.id)
-                    state.selectedItems [indexI].quantity--; 
+                    state.selectedItems [indexD].quantity--; 
                     
                     return{
                         ...state
@@ -56,7 +56,7 @@ const CartContextProvider = ({children}) => {
     const [state , dispatch] = useReducer (cartReducer , initialState)
     return (
         <div>
-            <CartContext.Provider>
+            <CartContext.Provider value={{state , dispatch}}>
                 {children}
             </CartContext.Provider>
         </div>
