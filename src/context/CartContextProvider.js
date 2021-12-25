@@ -4,24 +4,34 @@ export const CartContext = createContext()
 
 const initialState = {
  selectedItems : [],
- cartCounter : 0,
- totla: 0,
- checkout : 0
+ itemCounter : 0,
+ total: 0,
+ checkout : false,
+}
+
+const sumItems = items =>{
+    const itemCounter = items.reduce ((sum , item) => sum + item.quantity , 0);
+    const total = items.reduce ((total , item) => total + item.price * item.quantity  , 0).toFixed(2);
+    return {itemCounter , total}
 }
 
 const cartReducer = (state , action) => {
+
   
     switch (action.type){
         case "ADD_ITEM" :
             if ( !state.selectedItems.find(item => item.id === action.payload.id)){
                 state.selectedItems.push ({
                     ...action.payload,
-                    quantity : 1
+                    quantity : 1,
+                    
                 })
 
             return {
                 ...state,
-                selectedItems : [...state.selectedItems]
+                selectedItems : [...state.selectedItems],
+                ...sumItems(state.selectedItems),
+                checkout: false,
             }
 
             }
@@ -29,7 +39,8 @@ const cartReducer = (state , action) => {
             const newSelectedItems = state.selectedItems.filter (item => item.id !== action.payload.id);
             return {
                 ...state,
-                selectedItems :[...newSelectedItems]
+                selectedItems :[...newSelectedItems],
+                ...sumItems(newSelectedItems),
             }
             
             case "INCREASE" :
@@ -38,6 +49,7 @@ const cartReducer = (state , action) => {
                 
                 return{
                     ...state,
+                    ...sumItems(state.selectedItems),
                 }
 
                 case "DECREASE" :
@@ -45,7 +57,24 @@ const cartReducer = (state , action) => {
                     state.selectedItems [indexD].quantity--; 
                     
                     return{
-                        ...state
+                        ...state,
+                        ...sumItems(state.selectedItems),
+                    }
+
+                case "CHECKOUT" :
+                    return {
+                        selectedItems : [],
+                        itemCounter : 0,
+                        total: 0,
+                        checkout : true,
+                    }
+
+                case "CLEAR" : 
+                    return {
+                        selectedItems : [],
+                        itemCounter : 0,
+                        total: 0,
+                        checkout : false,
                     }
         }
 
